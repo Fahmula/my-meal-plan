@@ -8,6 +8,8 @@ for every week, and a daily **Home Assistant** webhook so your phone can tell yo
 
 **Stack:** Python 3 · FastAPI · Jinja2 · htmx · Tailwind CSS 4 + daisyUI 5 · SortableJS · SQLite · Docker
 
+*Built with the help of AI (Claude by Anthropic).*
+
 ---
 
 ## Features
@@ -114,6 +116,43 @@ data/
 ```
 
 Back up that folder (ideally while the container is stopped, or with `sqlite3 data/meal-plan.db ".backup backup.db"`).
+
+---
+
+## Unraid
+
+An Unraid template lives in [`unraid/my-meal-plan.xml`](unraid/my-meal-plan.xml). It uses the
+prebuilt image, stores data in `/mnt/user/appdata/my-meal-plan` and runs as `nobody:users` (99:100).
+
+**1. Make the image pullable.** The repository is private, so its image is private too. The easiest
+fix is to make the *package* public (the source code stays private): on GitHub open
+**Packages → my-meal-plan → Package settings → Change visibility → Public**.
+
+> If you'd rather keep it private, you have to run `docker login ghcr.io` on Unraid (with a token
+> that has `read:packages`). Unraid keeps `/root` in RAM, so that login is lost on every reboot
+> and updates will fail until you log in again.
+
+**2. Add the template.** Open the Unraid terminal (the `>_` icon top right) and run:
+
+```bash
+curl -fsSL -o /boot/config/plugins/dockerMan/templates-user/my-my-meal-plan.xml https://raw.githubusercontent.com/Fahmula/my-meal-plan/main/unraid/my-meal-plan.xml
+```
+
+While the repository is private that URL needs authentication. Instead, copy
+`unraid/my-meal-plan.xml` to the flash share as
+`\\TOWER\flash\config\plugins\dockerMan\templates-user\my-my-meal-plan.xml`
+(user templates must start with `my-`).
+
+**3. Install.** Go to **Docker → Add Container**, choose **my-meal-plan** from the
+**Template** dropdown, check the port and Data path, and click **Apply**. Open it with
+**WebUI** from the container's menu on the Docker tab.
+
+**Icon.** Unraid downloads the icon from GitHub, which doesn't work while the repository is
+private. To get the icon anyway, copy `unraid/icon.png` to
+`\\TOWER\flash\config\plugins\dockerMan\images\my-meal-plan-icon.png`.
+
+**Updates.** Every push to `main` publishes a new `:latest`. Click **Check for Updates** on the
+Docker tab, then **apply update**. Your data in appdata is kept.
 
 ---
 

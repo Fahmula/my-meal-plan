@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>my-meal-plan</Name>
+  <Repository>ghcr.io/fahmula/my-meal-plan:latest</Repository>
+  <Registry>https://github.com/Fahmula/my-meal-plan/pkgs/container/my-meal-plan</Registry>
+  <Network>bridge</Network>
+  <MyIP/>
+  <Shell>sh</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/Fahmula/my-meal-plan/issues</Support>
+  <Project>https://github.com/Fahmula/my-meal-plan</Project>
+  <Overview>My Meal Plan - a simple, self-hosted planner for your family's dinners from Sunday to Saturday.&#xD;
+&#xD;
+Reusable meal presets with photos, drag-and-drop swapping that works on phones, separate schedules for every week, Copy Last Week, Clear Week and random meals.&#xD;
+&#xD;
+Home Assistant integration: every day at your reminder time the server POSTs tonight's dinner to a Home Assistant webhook so you get a "Dinner Tonight" notification on your phone. Configure the webhook URL, reminder time and timezone in the app under Settings.&#xD;
+&#xD;
+All data (SQLite database + meal photos) is stored in the Data path.</Overview>
+  <Category>HomeAutomation: Productivity:</Category>
+  <WebUI>http://[IP]:[PORT:3000]/</WebUI>
+  <TemplateURL>https://raw.githubusercontent.com/Fahmula/my-meal-plan/main/unraid/my-meal-plan.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/Fahmula/my-meal-plan/main/unraid/icon.png</Icon>
+  <ExtraParams/>
+  <PostArgs/>
+  <CPUset/>
+  <DateInstalled/>
+  <DonateText/>
+  <DonateLink/>
+  <Requires/>
+  <Config Name="Web UI Port" Target="3000" Default="3000" Mode="tcp" Description="Port for the web interface." Type="Port" Display="always" Required="true" Mask="false">3000</Config>
+  <Config Name="Data" Target="/data" Default="/mnt/user/appdata/my-meal-plan" Mode="rw" Description="SQLite database (meal-plan.db) and uploaded meal photos (uploads/). Back this folder up." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/my-meal-plan</Config>
+  <Config Name="Timezone (first start)" Target="DEFAULT_TIMEZONE" Default="America/New_York" Mode="" Description="Timezone used for 'today' and the dinner reminder on first start. Change it later in the app under Settings." Type="Variable" Display="always" Required="false" Mask="false">America/New_York</Config>
+  <Config Name="App URL (optional)" Target="APP_BASE_URL" Default="" Mode="" Description="The address you open the app with, e.g. http://192.168.1.20:3000. When set, Home Assistant webhooks include an image_url so notifications can show the meal photo." Type="Variable" Display="always" Required="false" Mask="false"/>
+  <Config Name="PUID" Target="PUID" Default="99" Mode="" Description="User ID that owns the files in the Data path (99 = nobody on Unraid)." Type="Variable" Display="advanced" Required="true" Mask="false">99</Config>
+  <Config Name="PGID" Target="PGID" Default="100" Mode="" Description="Group ID that owns the files in the Data path (100 = users on Unraid)." Type="Variable" Display="advanced" Required="true" Mask="false">100</Config>
+  <Config Name="TZ" Target="TZ" Default="America/New_York" Mode="" Description="Container clock / log timestamps." Type="Variable" Display="advanced" Required="false" Mask="false">America/New_York</Config>
+  <Config Name="Log level" Target="LOG_LEVEL" Default="info" Mode="" Description="debug, info, warning or error." Type="Variable" Display="advanced" Required="false" Mask="false">info</Config>
+</Container>
