@@ -1,0 +1,46 @@
+{% from "macros.html" import icon, meal_thumb %}
+<article class="day-card{% if d.is_today %} is-today{% endif %}" style="{{ d.style }}"
+         data-date="{{ d.date }}" data-day="{{ d.day }}">
+  <div class="day-label">
+    <span class="day-short">{{ d.short }}</span>
+    <span class="day-full">{{ d.day }}</span>
+    <span class="day-date">{{ d.date|short_date }}</span>
+    {% if d.is_today %}<span class="today-badge">Today</span>{% endif %}
+  </div>
+
+  {# The slot is the drag-and-drop zone; its single .meal-item moves between days. #}
+  <div class="day-slot" data-slot>
+    {% if d.meal %}
+    <div class="meal-item" style="{{ d.style }}" data-meal-id="{{ d.meal.id }}" data-meal-name="{{ d.meal.name }}"
+         data-day-action="edit" role="button" tabindex="0" aria-label="Edit {{ d.meal.name }}">
+      {{ meal_thumb(d.meal) }}
+      <div class="meal-text">
+        <h3 class="meal-name">{{ d.meal.name }}</h3>
+        {% if d.meal.description %}<p class="meal-desc">{{ d.meal.description }}</p>{% endif %}
+      </div>
+    </div>
+    {% else %}
+    <div class="meal-item is-empty" style="{{ d.style }}">
+      <button type="button" class="meal-thumb meal-thumb-add" data-day-action="edit" aria-label="Add a meal">
+        {{ icon("plus", "size-6") }}
+      </button>
+      <div class="meal-text">
+        <p class="meal-name meal-name-empty">No meal planned</p>
+        <div class="empty-actions">
+          <button type="button" class="add-meal-btn" data-day-action="edit">{{ icon("plus", "size-4") }}Add Meal</button>
+          {% if library_count %}
+          <button type="button" class="random-btn" data-day-action="random"
+                  title="Pick a random saved meal" aria-label="Pick a random saved meal">
+            {{ icon("dice", "size-4") }}<span class="hidden sm:inline">Surprise me</span>
+          </button>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <button type="button" class="day-open" data-day-action="edit" aria-label="Open {{ d.day }}">
+    {{ icon("chevron-right") }}
+  </button>
+</article>

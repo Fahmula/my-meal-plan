@@ -1,0 +1,61 @@
+{% from "macros.html" import icon, meal_thumb %}
+{% if meals %}
+<ul class="library-list">
+  {% for m in meals %}
+  <li class="library-row">
+    <div class="library-main">
+      {{ meal_thumb(m, "meal-thumb-md") }}
+      <div class="min-w-0 flex-1">
+        <h3 class="font-semibold leading-snug">{{ m.name }}</h3>
+        {% if m.description %}<p class="mt-0.5 text-sm text-base-content/60 line-clamp-2">{{ m.description }}</p>{% endif %}
+        <p class="mt-1 text-xs text-base-content/45">
+          {% if m.times_planned %}Planned {{ m.times_planned }}×{% else %}Not planned yet{% endif %}
+        </p>
+      </div>
+    </div>
+
+    <div class="library-actions">
+      <details class="plan-details">
+        <summary class="btn btn-sm soft-btn">{{ icon("calendar-plus", "size-4") }}Plan</summary>
+        <div class="plan-panel">
+          <p class="text-xs text-base-content/55 mb-2">Plan <b>{{ m.name }}</b> for… <span class="whitespace-nowrap">(week of {{ week|short_date }})</span></p>
+          <div class="plan-days">
+            {% for day in week_days %}
+            <button type="button" class="plan-day{% if day.meal and day.meal.id == m.id %} is-same{% endif %}" style="{{ day.style }}"
+                    hx-post="/ui/day/{{ day.date }}/assign" hx-vals='{"meal_id": "{{ m.id }}"}'
+                    title="{{ day.day }}{{ ': ' ~ day.meal.name if day.meal else ' (empty)' }}">
+              <span class="plan-day-name">{{ day.short }}</span>
+              <span class="plan-day-num">{{ day.date.day }}</span>
+              {% if day.meal %}<span class="plan-day-dot" aria-label="has a meal"></span>{% endif %}
+            </button>
+            {% endfor %}
+          </div>
+        </div>
+      </details>
+      <button type="button" class="icon-btn" title="Edit meal" aria-label="Edit {{ m.name }}"
+              hx-get="/ui/library/{{ m.id }}/edit?week={{ week }}" hx-target="#modal-content">{{ icon("pencil", "size-4") }}</button>
+      <button type="button" class="icon-btn" title="Duplicate meal" aria-label="Duplicate {{ m.name }}"
+              hx-post="/ui/library/{{ m.id }}/duplicate" hx-vals='{"week": "{{ week }}"}' hx-target="#modal-content">{{ icon("copy", "size-4") }}</button>
+      <button type="button" class="icon-btn icon-btn-danger" title="Delete permanently" aria-label="Delete {{ m.name }} permanently"
+              hx-delete="/ui/library/{{ m.id }}?week={{ week }}&q={{ q|urlencode }}" hx-target="#modal-content"
+              hx-confirm="Delete {{ m.name }} permanently?"
+              data-confirm-detail="This removes it from your Meal Library{% if m.times_planned %} and from the {{ m.times_planned }} day{{ 's' if m.times_planned != 1 }} it's planned on{% endif %}. This can't be undone."
+              data-confirm-ok="Delete permanently">{{ icon("trash", "size-4") }}</button>
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% elif q %}
+<div class="empty-state">
+  {{ icon("search", "size-8") }}
+  <p class="font-semibold">No meals match “{{ q }}”</p>
+  <button type="button" class="link-btn" hx-get="/ui/library/new?week={{ week }}" hx-target="#modal-content">{{ icon("plus", "size-4") }}Add a new meal</button>
+</div>
+{% else %}
+<div class="empty-state">
+  {{ icon("utensils", "size-8") }}
+  <p class="font-semibold">No saved meals yet</p>
+  <p class="text-sm text-base-content/60">Add your family's favourites once and reuse them any week.</p>
+  <button type="button" class="btn btn-primary rounded-full mt-2" hx-get="/ui/library/new?week={{ week }}" hx-target="#modal-content">{{ icon("plus", "size-4") }}Add your first meal</button>
+</div>
+{% endif %}

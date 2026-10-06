@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% from "macros.html" import icon %}
+{% block content %}
+<div class="page">
+  <header class="app-header">
+    <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+      <div class="brand-mark">{{ icon("utensils", "size-6 sm:size-7") }}</div>
+      <div class="min-w-0">
+        <h1 class="app-title">My Meal Plan</h1>
+        <p class="app-subtitle">A simple plan for a delicious week</p>
+      </div>
+    </div>
+    <nav class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+      <button class="header-btn"
+              hx-get="/ui/library" hx-target="#modal-content"
+              hx-vals="js:{week: document.getElementById('week-region').dataset.weekStart}"
+              aria-label="Meal Library">
+        {{ icon("book") }}<span class="hidden sm:inline">Meal Library</span>
+      </button>
+      <button class="header-btn" hx-get="/ui/settings" hx-target="#modal-content" aria-label="Settings">
+        {{ icon("settings") }}<span class="hidden sm:inline">Settings</span>
+      </button>
+    </nav>
+  </header>
+
+  <main>
+    {% include "partials/week.html" %}
+  </main>
+</div>
+{% endblock %}

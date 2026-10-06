@@ -1,0 +1,18 @@
+{% from "macros.html" import icon %}
+{% if logs %}
+<ul class="log-list">
+  {% for log in logs %}
+  <li class="log-row">
+    <span class="log-status {{ 'is-ok' if log.success else 'is-fail' }}">{{ icon("check" if log.success else "x", "size-3.5") }}</span>
+    <span class="min-w-0 flex-1">
+      <span class="block truncate font-medium">{{ log.meal_name or "—" }}</span>
+      <span class="block text-xs text-base-content/50">{{ log.timestamp|local_dt }} · {{ "Test" if log.kind == "test" else "Scheduled" }}{% if log.payload.date %} · for {{ log.payload.day }}{% endif %}</span>
+      {% if log.error and not log.success %}<span class="block truncate text-xs text-error/80" title="{{ log.error }}">{{ log.error }}</span>{% endif %}
+    </span>
+    <span class="log-code {{ 'is-ok' if log.success else 'is-fail' }}">{{ log.response_status or "ERR" }}</span>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="rounded-2xl bg-base-200/70 px-4 py-5 text-center text-sm text-base-content/55">No webhooks sent yet.</p>
+{% endif %}

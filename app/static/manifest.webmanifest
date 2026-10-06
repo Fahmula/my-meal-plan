@@ -1,0 +1,12 @@
+{
+  "name": "My Meal Plan",
+  "short_name": "Meal Plan",
+  "description": "A simple plan for a delicious week",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8f4ee",
+  "theme_color": "#f8f4ee",
+  "icons": [
+    { "src": "/static/img/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

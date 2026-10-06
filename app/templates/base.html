@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en" data-theme="mealplan">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f8f4ee">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="My Meal Plan">
+  <meta name="htmx-config" content='{"historyCacheSize": 0, "refreshOnHistoryMiss": true, "defaultSwapStyle": "innerHTML"}'>
+  <title>My Meal Plan</title>
+  <link rel="icon" href="{{ url_for('static', path='img/icon.svg') }}" type="image/svg+xml">
+  <link rel="manifest" href="{{ url_for('static', path='manifest.webmanifest') }}">
+  <link rel="preload" href="{{ url_for('static', path='fonts/plus-jakarta-sans.woff2') }}" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="{{ url_for('static', path='css/app.css') }}">
+  <script src="{{ url_for('static', path='vendor/htmx.min.js') }}" defer></script>
+  <script src="{{ url_for('static', path='vendor/Sortable.min.js') }}" defer></script>
+  <script src="{{ url_for('static', path='js/app.js') }}" defer></script>
+</head>
+<body class="min-h-dvh bg-base-200 text-base-content antialiased">
+  {% block content %}{% endblock %}
+
+  {# Shared modal – content is loaded into #modal-content by htmx #}
+  <dialog id="modal" class="modal modal-bottom sm:modal-middle">
+    <div class="modal-box app-modal" id="modal-content"></div>
+    <form method="dialog" class="modal-backdrop"><button aria-label="Close">close</button></form>
+  </dialog>
+
+  {# Confirmation dialog, used only for destructive actions #}
+  <dialog id="confirm-dialog" class="modal modal-bottom sm:modal-middle">
+    <div class="modal-box app-modal is-narrow">
+      <h3 class="font-display text-xl font-semibold" data-confirm-title></h3>
+      <p class="mt-2 text-sm text-base-content/70" data-confirm-detail></p>
+      <div class="modal-action">
+        <button type="button" class="btn btn-ghost rounded-full" data-confirm-cancel>Cancel</button>
+        <button type="button" class="btn btn-error rounded-full" data-confirm-accept>Delete</button>
+      </div>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button>close</button></form>
+  </dialog>
+
+  <div id="toasts" class="toast-stack" popover="manual" aria-live="polite"></div>
+</body>
+</html>

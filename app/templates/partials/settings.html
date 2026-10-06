@@ -1,0 +1,18 @@
+{% from "macros.html" import icon, modal_head %}
+<div data-modal-size="wide">
+  {{ modal_head("Settings", eyebrow="Home Assistant") }}
+  <p class="-mt-1 mb-5 text-sm text-base-content/60">
+    Every day at your reminder time the server sends tonight's dinner to a Home Assistant webhook,
+    so Home Assistant can notify your phone. No browser needs to stay open.
+  </p>
+
+  {% include "partials/settings_form.html" %}
+
+  <div class="mt-7">
+    <div class="flex items-center justify-between mb-2">
+      <h3 class="font-semibold flex items-center gap-2">{{ icon("history", "size-4") }}Webhook history</h3>
+      <button type="button" class="link-btn text-xs" hx-get="/ui/settings/logs" hx-target="#webhook-logs">Refresh</button>
+    </div>
+    <div id="webhook-logs">{% include "partials/webhook_logs.html" %}</div>
+  </div>
+</div>

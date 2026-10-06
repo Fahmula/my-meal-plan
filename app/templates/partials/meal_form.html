@@ -1,0 +1,37 @@
+{% from "macros.html" import icon, modal_head, meal_fields %}
+{{ modal_head("Edit Meal" if meal else "New Meal", eyebrow="Meal Library", back_url="/ui/library?week=" ~ week) }}
+
+<form class="meal-editor" hx-post="/ui/library/save" hx-encoding="multipart/form-data"
+      hx-target="#modal-content" hx-disabled-elt="find button[type=submit]">
+  <input type="hidden" name="week" value="{{ week }}">
+  <input type="hidden" name="meal_id" value="{{ meal.id if meal else '' }}">
+
+  {% if errors %}
+  <div role="alert" class="alert alert-error alert-soft text-sm">{{ icon("alert", "size-4") }}{{ errors }}</div>
+  {% endif %}
+
+  {{ meal_fields(meal, form) }}
+
+  {% if meal %}
+  <p class="text-xs text-base-content/50">
+    Created {{ meal.created_at|local_dt }} · Updated {{ meal.updated_at|local_dt }}
+    {% if meal.times_planned %} · Planned {{ meal.times_planned }}×{% endif %}
+  </p>
+  {% endif %}
+
+  <div class="modal-actions">
+    {% if meal %}
+    <button type="button" class="btn btn-ghost rounded-full text-error"
+            hx-delete="/ui/library/{{ meal.id }}?week={{ week }}" hx-target="#modal-content"
+            hx-confirm="Delete {{ meal.name }} permanently?"
+            data-confirm-detail="This removes it from your Meal Library{% if meal.times_planned %} and from the {{ meal.times_planned }} day{{ 's' if meal.times_planned != 1 }} it's planned on{% endif %}. This can't be undone."
+            data-confirm-ok="Delete permanently">
+      {{ icon("trash", "size-4") }}Delete<span class="hidden sm:inline"> permanently</span>
+    </button>
+    {% endif %}
+    <button type="button" class="btn btn-ghost rounded-full ml-auto" hx-get="/ui/library?week={{ week }}" hx-target="#modal-content">Cancel</button>
+    <button type="submit" class="btn btn-primary rounded-full px-8">
+      <span class="loading loading-spinner loading-xs htmx-indicator"></span>Save
+    </button>
+  </div>
+</form>

@@ -1,0 +1,22 @@
+{% from "macros.html" import icon, modal_head %}
+<div class="library" data-modal-size="wide">
+  {{ modal_head("Meal Library", eyebrow="Saved meals") }}
+  <p class="-mt-1 mb-4 text-sm text-base-content/60">
+    Your reusable meals. Removing a meal from a day never deletes it from here.
+  </p>
+
+  <div class="flex items-center gap-2 mb-4">
+    <label class="input picker-input flex-1 min-w-0">
+      {{ icon("search", "size-4 opacity-50") }}
+      <input type="search" name="q" value="{{ q }}" placeholder="Search meals…" autocomplete="off" enterkeyhint="search"
+             hx-get="/ui/library/list?week={{ week }}" hx-trigger="input changed delay:180ms, search"
+             hx-target="#library-list">
+    </label>
+    <button type="button" class="btn btn-primary rounded-full shrink-0"
+            hx-get="/ui/library/new?week={{ week }}" hx-target="#modal-content">
+      {{ icon("plus", "size-4") }}<span>Add<span class="hidden sm:inline"> Meal</span></span>
+    </button>
+  </div>
+
+  <div id="library-list">{% include "partials/library_list.html" %}</div>
+</div>

@@ -1,0 +1,59 @@
+{% from "macros.html" import icon %}
+<form id="settings-form" class="settings-form" hx-put="/ui/settings" hx-target="this" hx-swap="outerHTML">
+  <label class="setting-toggle">
+    <span>
+      <span class="font-semibold flex items-center gap-2">{{ icon("bell", "size-4") }}Dinner Reminder Enabled</span>
+      <span class="block text-xs text-base-content/55 mt-0.5">Send tonight's dinner to Home Assistant every day</span>
+    </span>
+    <input type="checkbox" name="notification_enabled" value="1" class="toggle toggle-success" {% if s.notification_enabled %}checked{% endif %}>
+  </label>
+
+  <label class="field">
+    <span class="field-label">Home Assistant Webhook URL</span>
+    <input type="url" name="home_assistant_webhook_url" value="{{ s.home_assistant_webhook_url }}"
+           class="input w-full{% if errors.home_assistant_webhook_url %} input-error{% endif %}"
+           placeholder="http://192.168.1.10:8123/api/webhook/meal_plan_dinner" inputmode="url" autocomplete="off" spellcheck="false">
+    {% if errors.home_assistant_webhook_url %}<span class="field-error">{{ errors.home_assistant_webhook_url }}</span>{% endif %}
+  </label>
+
+  <div class="grid gap-4 sm:grid-cols-2">
+    <label class="field">
+      <span class="field-label">Dinner Reminder Time</span>
+      <input type="time" name="notification_time" value="{{ s.notification_time }}" required
+             class="input w-full{% if errors.notification_time %} input-error{% endif %}">
+      {% if errors.notification_time %}<span class="field-error">{{ errors.notification_time }}</span>{% endif %}
+    </label>
+    <label class="field">
+      <span class="field-label">Timezone</span>
+      <select name="timezone" class="select w-full{% if errors.timezone %} select-error{% endif %}">
+        {% for tz in timezones %}<option value="{{ tz }}" {% if tz == s.timezone %}selected{% endif %}>{{ tz.replace('_', ' ') }}</option>{% endfor %}
+      </select>
+      {% if errors.timezone %}<span class="field-error">{{ errors.timezone }}</span>{% endif %}
+    </label>
+  </div>
+
+  <label class="setting-toggle">
+    <span>
+      <span class="font-semibold">Notify only if a meal is scheduled</span>
+      <span class="block text-xs text-base-content/55 mt-0.5">When off, empty days send “No meal planned”</span>
+    </span>
+    <input type="checkbox" name="notify_only_if_scheduled" value="1" class="toggle toggle-success" {% if s.notify_only_if_scheduled %}checked{% endif %}>
+  </label>
+
+  <p class="text-xs text-base-content/55 flex items-center gap-1.5">
+    {{ icon("calendar", "size-3.5") }}
+    {% if next_reminder %}Next reminder: <b>{{ next_reminder }}</b>
+    {% elif not s.home_assistant_webhook_url %}Add a webhook URL to start sending reminders.
+    {% else %}Reminders are turned off.{% endif %}
+  </p>
+
+  <div class="flex flex-wrap items-center gap-2 pt-1">
+    <button type="button" class="btn soft-btn rounded-full"
+            hx-post="/ui/settings/test" hx-target="#test-result" hx-swap="innerHTML"
+            hx-disabled-elt="this">
+      <span class="loading loading-spinner loading-xs htmx-indicator"></span>{{ icon("send", "size-4") }}Send Test Notification
+    </button>
+    <button type="submit" class="btn btn-primary rounded-full px-6 ml-auto">Save Settings</button>
+  </div>
+  <div id="test-result"></div>
+</form>

@@ -1,0 +1,22 @@
+{% from "macros.html" import icon, meal_thumb %}
+{% for m in meals %}
+<button type="button" class="picker-item" hx-get="/ui/day/{{ d }}/edit?meal_id={{ m.id }}" hx-target="#modal-content">
+  {{ meal_thumb(m, "meal-thumb-sm") }}
+  <span class="min-w-0 flex-1 text-left">
+    <span class="block truncate font-semibold">{{ m.name }}</span>
+    {% if m.description %}<span class="block truncate text-xs text-base-content/55">{{ m.description }}</span>{% endif %}
+  </span>
+  {{ icon("chevron-right", "size-4 opacity-40") }}
+</button>
+{% else %}
+<div class="picker-empty">
+  {% if q %}
+  <span>No saved meals match “{{ q }}”.</span>
+  <button type="button" class="link-btn" hx-get="/ui/day/{{ d }}/edit?new=1&name={{ q|urlencode }}" hx-target="#modal-content">
+    {{ icon("plus", "size-4") }}Create “{{ q }}”
+  </button>
+  {% else %}
+  <span>Your Meal Library is empty.</span>
+  {% endif %}
+</div>
+{% endfor %}

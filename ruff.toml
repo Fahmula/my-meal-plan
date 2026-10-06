@@ -1,0 +1,9 @@
+target-version = "py313"
+line-length = 120
+
+[lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+ignore = ["B008"]  # FastAPI's File()/Form()/Query() defaults are intentional
+
+[lint.per-file-ignores]
+"tests/conftest.py" = ["E402"]

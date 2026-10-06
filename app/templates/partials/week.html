@@ -1,0 +1,65 @@
+{% from "macros.html" import icon %}
+<section id="week-region" data-week-start="{{ start }}">
+  {# Re-fetches this region whenever another action fires the refreshWeek event #}
+  <div hidden hx-get="/ui/week?start={{ start }}" hx-trigger="refreshWeek from:body"
+       hx-target="#week-region" hx-swap="outerHTML"></div>
+
+  <div class="week-toolbar">
+    <div class="week-nav">
+      <button class="week-nav-btn" aria-label="Previous week"
+              hx-get="/ui/week?start={{ prev_start }}" hx-target="#week-region" hx-swap="outerHTML"
+              hx-push-url="/?week={{ prev_start }}">
+        {{ icon("chevron-left") }}<span class="hidden md:inline">Previous Week</span>
+      </button>
+      <div class="week-label">
+        <div class="week-range">{{ label }}</div>
+        <div class="week-relative">{{ relative }}</div>
+      </div>
+      <button class="week-nav-btn" aria-label="Next week"
+              hx-get="/ui/week?start={{ next_start }}" hx-target="#week-region" hx-swap="outerHTML"
+              hx-push-url="/?week={{ next_start }}">
+        <span class="hidden md:inline">Next Week</span>{{ icon("chevron-right") }}
+      </button>
+    </div>
+
+    <p class="week-hint">{{ icon("grip", "size-3.5 shrink-0") }}<span class="sm:hidden">Drag a meal to move or swap days</span><span class="hidden sm:inline">Drag a meal onto another day to move or swap it</span></p>
+
+    <div class="week-actions">
+      <button class="this-week-btn{% if is_current %} is-current{% endif %}"
+              hx-get="/ui/week" hx-target="#week-region" hx-swap="outerHTML" hx-push-url="/"
+              {% if is_current %}aria-current="true"{% endif %}>
+        {{ icon("calendar", "size-4") }}This Week
+      </button>
+      <div class="dropdown dropdown-end">
+        <div tabindex="0" role="button" class="week-menu-btn" aria-label="Week options">{{ icon("more") }}</div>
+        <ul tabindex="0" class="dropdown-content menu week-menu">
+          <li>
+            <button hx-post="/ui/week/copy-last" hx-vals='{"start": "{{ start }}"}'
+                    {% if planned_count %}
+                    hx-confirm="Replace this week with last week's meals?"
+                    data-confirm-detail="The {{ planned_count }} meal{{ 's' if planned_count != 1 }} planned this week will be replaced. Saved meals stay in your library."
+                    data-confirm-ok="Copy last week" data-confirm-tone="primary"
+                    {% endif %}
+                    {% if not prev_planned_count %}disabled{% endif %}>
+              {{ icon("copy", "size-4") }}Copy Last Week
+              {% if not prev_planned_count %}<span class="text-xs opacity-60">(empty)</span>{% endif %}
+            </button>
+          </li>
+          <li>
+            <button hx-post="/ui/week/clear" hx-vals='{"start": "{{ start }}"}'
+                    hx-confirm="Clear this week's plan?"
+                    data-confirm-detail="All {{ planned_count }} day{{ 's' if planned_count != 1 }} will be emptied. Your saved meals stay in the Meal Library."
+                    data-confirm-ok="Clear week" data-confirm-tone="primary"
+                    {% if not planned_count %}disabled{% endif %}>
+              {{ icon("calendar-x", "size-4") }}Clear Week
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="week-cards" id="week-cards">
+    {% for d in days %}{% include "partials/day_card.html" %}{% endfor %}
+  </div>
+</section>

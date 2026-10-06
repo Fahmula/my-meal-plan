@@ -1,0 +1,62 @@
+{% from "macros.html" import icon, meal_thumb, modal_head, meal_fields %}
+{{ modal_head(("Edit Meal" if current else "Add Meal") ~ " — " ~ day,
+              eyebrow=day[:3]|upper ~ " · " ~ (d|short_date), eyebrow_style=day_style(d)) }}
+
+<div class="picker">
+  <label class="input picker-input w-full">
+    {{ icon("search", "size-4 opacity-50") }}
+    <input type="search" name="q" placeholder="{{ 'Search your Meal Library…' if library_count else 'Your Meal Library is empty' }}"
+           autocomplete="off" enterkeyhint="search"
+           hx-get="/ui/day/{{ d }}/picker" hx-trigger="input changed delay:180ms, search, focus once"
+           hx-target="#picker-results" {% if not library_count %}disabled{% endif %}>
+  </label>
+  <div id="picker-results" class="picker-results"></div>
+  <div class="picker-footer">
+    <span class="text-xs text-base-content/50">{{ library_count }} saved meal{{ 's' if library_count != 1 }}</span>
+    <button type="button" class="link-btn" hx-get="/ui/day/{{ d }}/edit?new=1" hx-target="#modal-content">
+      {{ icon("plus", "size-4") }}Create New Meal
+    </button>
+  </div>
+</div>
+
+<form class="meal-editor" hx-post="/ui/day/{{ d }}/save" hx-encoding="multipart/form-data"
+      hx-target="#modal-content" hx-disabled-elt="find button[type=submit]">
+  <input type="hidden" name="meal_id" value="{{ meal.id if meal else '' }}">
+
+  {% if errors %}
+  <div role="alert" class="alert alert-error alert-soft text-sm">{{ icon("alert", "size-4") }}{{ errors }}</div>
+  {% endif %}
+
+  {% if picked %}
+  <div class="picked-note">{{ icon("circle-check", "size-4") }}Selected from your library. Press Save to plan it for {{ day }}.</div>
+  {% endif %}
+
+  {{ meal_fields(meal, form) }}
+
+  {% if meal %}
+  <div class="library-note">
+    {{ icon("book", "size-4 shrink-0 mt-0.5") }}
+    <div class="min-w-0">
+      <p>Edits update the saved meal <b>{{ meal.name }}</b> everywhere it's planned.</p>
+      <label class="mt-1.5 flex items-center gap-2 cursor-pointer">
+        <input type="checkbox" name="save_as_new" value="1" class="checkbox checkbox-xs rounded-md">
+        <span>Save as a new meal instead</span>
+      </label>
+    </div>
+  </div>
+  {% else %}
+  <p class="library-note">{{ icon("book", "size-4 shrink-0") }}<span>This meal is also saved to your Meal Library so you can reuse it.</span></p>
+  {% endif %}
+
+  <div class="modal-actions">
+    {% if current %}
+    <button type="button" class="btn btn-ghost rounded-full remove-week-btn"
+            hx-post="/ui/day/{{ d }}/remove" title="Keeps the meal in your Meal Library">
+      {{ icon("calendar-minus", "size-4") }}Remove From Week
+    </button>
+    {% endif %}
+    <button type="submit" class="btn btn-primary rounded-full px-8 ml-auto">
+      <span class="loading loading-spinner loading-xs htmx-indicator"></span>Save
+    </button>
+  </div>
+</form>

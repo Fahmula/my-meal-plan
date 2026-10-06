@@ -1,0 +1,22 @@
+services:
+  my-meal-plan:
+    # Prebuilt by GitHub Actions on every push to main: `docker compose pull && docker compose up -d`
+    # Or build from source on the server:              `docker compose up -d --build`
+    image: ghcr.io/fahmula/my-meal-plan:latest
+    build: .
+    container_name: my-meal-plan
+    restart: unless-stopped
+    ports:
+      # host:container – change APP_PORT in .env to use a different host port
+      - "${APP_PORT:-3000}:3000"
+    environment:
+      TZ: ${TZ:-America/New_York}
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      DEFAULT_TIMEZONE: ${DEFAULT_TIMEZONE:-America/New_York}
+      APP_BASE_URL: ${APP_BASE_URL:-}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    volumes:
+      # SQLite database (meal-plan.db) + uploaded meal images (uploads/).
+      # Survives container restarts, rebuilds and `docker compose down`.
+      - ${DATA_PATH:-./data}:/data

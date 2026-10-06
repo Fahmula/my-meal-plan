@@ -1,0 +1,79 @@
+# CI: lint and tests on pushes to main and dev and on every pull request; on main
+# only, also build the Docker image and publish it to ghcr.io/fahmula/my-meal-plan
+# (:latest and :sha-<commit>). "Run workflow" on main rebuilds it.
+# Branches: feature/* -> PR into dev (no image) -> PR dev into main (image).
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v10.2.0  # this action publishes exact tags only
+        with:
+          python-version: "3.13"
+          enable-cache: true
+          cache-dependency-glob: "requirements*.txt"
+
+      - name: Install
+        run: |
+          uv venv .venv
+          uv pip install --python .venv/bin/python -r requirements-dev.txt
+
+      - name: Lint
+        run: |
+          .venv/bin/ruff check app tests
+          .venv/bin/ruff format --check app tests
+
+      - name: Tests
+        run: .venv/bin/python -m pytest -q
+
+  image:
+    needs: [test]
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'  # push or manual run
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: docker/setup-buildx-action@v4
+
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ghcr.io/fahmula/my-meal-plan
+          tags: |
+            type=raw,value=latest
+            type=sha,prefix=sha-,format=short
+          labels: |
+            org.opencontainers.image.title=My Meal Plan
+            org.opencontainers.image.description=Self-hosted weekly dinner planner with Home Assistant reminders
+
+      - uses: docker/build-push-action@v7
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

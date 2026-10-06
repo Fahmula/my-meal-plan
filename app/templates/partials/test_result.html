@@ -1,0 +1,15 @@
+{% from "macros.html" import icon %}
+{% if result.success %}
+<div role="alert" class="alert alert-success alert-soft mt-3 text-sm">
+  {{ icon("circle-check", "size-5") }}
+  <span><b>Test sent successfully</b> · HTTP {{ result.response_status }}<br>
+  <span class="text-xs opacity-75">Home Assistant accepted the webhook. Check your automation ran.</span></span>
+</div>
+{% else %}
+<div role="alert" class="alert alert-error alert-soft mt-3 text-sm">
+  {{ icon("alert", "size-5") }}
+  <span><b>Test failed</b>{% if result.response_status %} · HTTP {{ result.response_status }}{% endif %}<br>
+  <span class="text-xs opacity-80 break-all">{{ result.error or "Unknown error" }}</span></span>
+</div>
+{% endif %}
+<div id="webhook-logs" hx-swap-oob="innerHTML">{% include "partials/webhook_logs.html" %}</div>
